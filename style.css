@@ -1,19 +1,23 @@
 body {
     font-family: "Helvetica", sans-serif;
-    margin: 16px 64px
+    margin: 16px 64px;
+    background-color: white;
 }
 
 h4 {
     padding: 4px 8px;
 }
 
+a {
+    display: block;
+}
 
 .coverage {
     font-size: small;
     font-weight: normal;
 }
 
-a {
+label {
     padding: 8px 8px;
     color: black;
     text-decoration: none;
@@ -22,15 +26,15 @@ a {
 }
 
 
-.passed a {
+.passed label {
     background-color: #dfd;
 }
 
-.skipped a {
+.skipped label {
     background-color: #eee;
 }
 
-.failed a {
+.failed label {
     background-color: #fdd;
 }
 
@@ -44,9 +48,6 @@ a {
 
 .passed .badge {
     background-color: #5c5;
-}
-
-.skipped .badge {
 }
 
 .failed .badge {
@@ -63,6 +64,7 @@ a {
     border-bottom: thin #eeeeee solid;
     color: #444;
     white-space: pre;
+    background-color: #BBB;
 }
 
 .duration {
@@ -71,4 +73,37 @@ a {
 
 div:target .expando {
     display: block
+}
+
+.toggle-el {
+    /* padding: 2rem; */
+    /* height: 240px; */
+    background: white;
+    transition: all 0.2s ease;
+    opacity: 1;
+    margin-top: 1rem;
+    overflow: hidden;
+}
+ 
+input[type=checkbox].hide-input:not(:checked) + .toggle-el {
+    height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+ 
+input.hide-input {
+    position: absolute;
+    left: -999em;
+}
+ 
+label.toggle {
+    display: block;
+    cursor: pointer;
+    padding: 0.5em 1em;
+    font-size: 1rem;
+    color: #242424;
+    /* background: #b5b5b5; */
+    border-radius: 3px;
+    user-select: none;
 }

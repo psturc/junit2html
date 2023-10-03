@@ -15,29 +15,32 @@ import (
 //go:embed style.css
 var styles string
 
-func printTest(s junit.Testsuite, c junit.Testcase) {
-	id := fmt.Sprintf("%s.%s.%s", s.Name, c.Classname, c.Name)
+func printTest(testSuite junit.Testsuite, testCase junit.Testcase) {
+	id := fmt.Sprintf("%s.%s.%s", testSuite.Name, testCase.Classname, testCase.Name)
 	class, text := "passed", "Pass"
-	f := c.Failure
-	if f != nil {
+	failure := testCase.Failure
+	if failure != nil {
 		class, text = "failed", "Fail"
 	}
-	k := c.Skipped
-	if k != nil {
+	skipped := testCase.Skipped
+	if skipped != nil {
 		class, text = "skipped", "Skip"
 	}
-	fmt.Printf("<div class='%s' id='%s'>\n", class, id)
-	fmt.Printf("<a href='#%s'>%s <span class='badge'>%s</span></a>\n", id, c.Name, text)
-	fmt.Printf("<div class='expando'>\n")
-	if f != nil {
-		f.Data = strings.ReplaceAll(f.Data, `<bool>`, `"bool"`)
-		c.SystemErr.Data = strings.ReplaceAll(c.SystemErr.Data, `<bool>`, `"bool"`)
-		fmt.Printf("<div class='content'>%s</div>\n", f.Data)
-		fmt.Printf("<div class='content'>%s</div>\n", c.SystemErr.Data)
-	} else if k != nil {
-		fmt.Printf("<div class='content'>%s</div>\n", k.Message)
+
+	fmt.Printf("<div class='%s' id='%s'>\n", class, "div-"+id)
+
+	fmt.Printf("<label for='%s' class='toggle'>%s<span class='badge'>%s</span></a></label>\n", id, testCase.Name, text)
+	fmt.Printf("<input type='checkbox' name='one' id='%s' class='hide-input'>", id)
+	fmt.Printf("<div class='toggle-el'>\n")
+	if failure != nil {
+		failure.Data = strings.ReplaceAll(failure.Data, `<bool>`, `"bool"`)
+		testCase.SystemErr.Data = strings.ReplaceAll(testCase.SystemErr.Data, `<bool>`, `"bool"`)
+		fmt.Printf("<div class='content'>%s</div>\n", failure.Data)
+		fmt.Printf("<div class='content'>%s</div>\n", testCase.SystemErr.Data)
+	} else if skipped != nil {
+		fmt.Printf("<div class='content'>%s</div>\n", skipped.Message)
 	}
-	d, _ := time.ParseDuration(c.Time)
+	d, _ := time.ParseDuration(testCase.Time)
 	fmt.Printf("<p class='duration' title='Test duration'>%v</p>\n", d)
 	fmt.Printf("</div>\n")
 	fmt.Printf("</div>\n")
