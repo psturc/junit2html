@@ -9,20 +9,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jstemmer/go-junit-report/formatter"
+	"github.com/jstemmer/go-junit-report/v2/junit"
 )
 
 //go:embed style.css
 var styles string
 
-func printTest(s formatter.JUnitTestSuite, c formatter.JUnitTestCase) {
+func printTest(s junit.Testsuite, c junit.Testcase) {
 	id := fmt.Sprintf("%s.%s.%s", s.Name, c.Classname, c.Name)
 	class, text := "passed", "Pass"
 	f := c.Failure
 	if f != nil {
 		class, text = "failed", "Fail"
 	}
-	k := c.SkipMessage
+	k := c.Skipped
 	if k != nil {
 		class, text = "skipped", "Skip"
 	}
@@ -30,7 +30,10 @@ func printTest(s formatter.JUnitTestSuite, c formatter.JUnitTestCase) {
 	fmt.Printf("<a href='#%s'>%s <span class='badge'>%s</span></a>\n", id, c.Name, text)
 	fmt.Printf("<div class='expando'>\n")
 	if f != nil {
-		fmt.Printf("<div class='content'>%s</div>\n", f.Contents)
+		f.Data = strings.ReplaceAll(f.Data, `<bool>`, `"bool"`)
+		c.SystemErr.Data = strings.ReplaceAll(c.SystemErr.Data, `<bool>`, `"bool"`)
+		fmt.Printf("<div class='content'>%s</div>\n", f.Data)
+		fmt.Printf("<div class='content'>%s</div>\n", c.SystemErr.Data)
 	} else if k != nil {
 		fmt.Printf("<div class='content'>%s</div>\n", k.Message)
 	}
@@ -38,10 +41,11 @@ func printTest(s formatter.JUnitTestSuite, c formatter.JUnitTestCase) {
 	fmt.Printf("<p class='duration' title='Test duration'>%v</p>\n", d)
 	fmt.Printf("</div>\n")
 	fmt.Printf("</div>\n")
+
 }
 
 func main() {
-	suites := &formatter.JUnitTestSuites{}
+	suites := &junit.Testsuites{}
 
 	err := xml.NewDecoder(os.Stdin).Decode(suites)
 	if err != nil {
@@ -59,13 +63,13 @@ func main() {
 	failures, total := 0, 0
 	for _, s := range suites.Suites {
 		failures += s.Failures
-		total += len(s.TestCases)
+		total += len(s.Testcases)
 	}
 	fmt.Printf("<p>%d of %d tests failed</p>\n", failures, total)
 	for _, s := range suites.Suites {
 		if s.Failures > 0 {
 			printSuiteHeader(s)
-			for _, c := range s.TestCases {
+			for _, c := range s.Testcases {
 				if f := c.Failure; f != nil {
 					printTest(s, c)
 				}
@@ -74,7 +78,7 @@ func main() {
 	}
 	for _, s := range suites.Suites {
 		printSuiteHeader(s)
-		for _, c := range s.TestCases {
+		for _, c := range s.Testcases {
 			if c.Failure == nil {
 				printTest(s, c)
 			}
@@ -84,12 +88,12 @@ func main() {
 	fmt.Println("</html>")
 }
 
-func printSuiteHeader(s formatter.JUnitTestSuite) {
+func printSuiteHeader(s junit.Testsuite) {
 	fmt.Println("<h4>")
 	fmt.Println(s.Name)
-	for _, p := range s.Properties {
+	for _, p := range *s.Properties {
 		if strings.HasPrefix(p.Name, "coverage.") {
-			v, _ := strconv.ParseFloat(p.Value, 10)
+			v, _ := strconv.ParseFloat(p.Value, 32)
 			fmt.Printf("<span class='coverage' title='%s'>%.0f%%</span>\n", p.Name, v)
 		}
 	}
