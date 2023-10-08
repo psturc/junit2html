@@ -35,8 +35,8 @@ func printTest(testSuite junit.Testsuite, testCase junit.Testcase) {
 	if failure != nil {
 		failure.Data = strings.ReplaceAll(failure.Data, `<bool>`, `"bool"`)
 		testCase.SystemErr.Data = strings.ReplaceAll(testCase.SystemErr.Data, `<bool>`, `"bool"`)
-		fmt.Printf("<div class='content'>%s</div>\n", failure.Data)
-		fmt.Printf("<div class='content'>%s</div>\n", testCase.SystemErr.Data)
+		fmt.Printf("<div class='content'><b>Failure details:</b> \n\n%s</div>\n", failure.Data)
+		fmt.Printf("<div class='content'><b>Log:</b> \n\n%s</div>\n", testCase.SystemErr.Data)
 	} else if skipped != nil {
 		fmt.Printf("<div class='content'>%s</div>\n", skipped.Message)
 	}
@@ -78,7 +78,9 @@ func main() {
 				}
 			}
 		}
+		printGatherLinks(s)
 	}
+
 	for _, s := range suites.Suites {
 		printSuiteHeader(s)
 		for _, c := range s.Testcases {
@@ -94,11 +96,24 @@ func main() {
 func printSuiteHeader(s junit.Testsuite) {
 	fmt.Println("<h4>")
 	fmt.Println(s.Name)
-	for _, p := range *s.Properties {
-		if strings.HasPrefix(p.Name, "coverage.") {
-			v, _ := strconv.ParseFloat(p.Value, 32)
-			fmt.Printf("<span class='coverage' title='%s'>%.0f%%</span>\n", p.Name, v)
+	if s.Properties != nil {
+		for _, p := range *s.Properties {
+			if strings.HasPrefix(p.Name, "coverage.") {
+				v, _ := strconv.ParseFloat(p.Value, 32)
+				fmt.Printf("<span class='coverage' title='%s'>%.0f%%</span>\n", p.Name, v)
+			}
 		}
+
 	}
 	fmt.Println("</h4>")
+}
+
+func printGatherLinks(s junit.Testsuite) {
+	if s.Properties != nil {
+		for _, p := range *s.Properties {
+			if strings.Contains(p.Name, "gather") {
+				fmt.Printf("<a href='%s'>Link to %s artifacts</a>\n", p.Value, p.Name)
+			}
+		}
+	}
 }

@@ -60,11 +60,12 @@ label {
 }
 
 .content {
-    padding: 16px 0;
+    padding: 8px;
     border-bottom: thin #eeeeee solid;
     color: #444;
     white-space: pre;
-    background-color: #BBB;
+    background-color: #EEE;
+    font-family: 'Courier New';
 }
 
 .duration {
