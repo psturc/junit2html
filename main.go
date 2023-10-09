@@ -69,6 +69,7 @@ func main() {
 		total += len(s.Testcases)
 	}
 	fmt.Printf("<p>%d of %d tests failed</p>\n", failures, total)
+	printLinkToReport(suites.Suites)
 	for _, s := range suites.Suites {
 		if s.Failures > 0 {
 			printSuiteHeader(s)
@@ -113,6 +114,18 @@ func printGatherLinks(s junit.Testsuite) {
 		for _, p := range *s.Properties {
 			if strings.Contains(p.Name, "gather") {
 				fmt.Printf("<a href='%s'>Link to %s artifacts</a>\n", p.Value, p.Name)
+			}
+		}
+	}
+}
+
+func printLinkToReport(suites []junit.Testsuite) {
+	for _, suite := range suites {
+		if suite.Properties != nil {
+			for _, p := range *suite.Properties {
+				if strings.Contains(p.Name, "html-report-link") {
+					fmt.Printf("<a href='%s' target=”_blank” >Having trouble viewing this report? Click here to open it in another tab</a>\n", p.Value)
+				}
 			}
 		}
 	}
