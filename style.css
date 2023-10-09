@@ -66,6 +66,7 @@ label {
     white-space: pre;
     background-color: #EEE;
     font-family: 'Courier New';
+    text-wrap: wrap;
 }
 
 .duration {
