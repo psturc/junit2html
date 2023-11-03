@@ -6,7 +6,7 @@ import (
 	"os"
 
 	reporters "github.com/onsi/ginkgo/v2/reporters"
-	"github.com/redhat-appstudio-qe/junit2html/pkg/convert"
+	"github.com/psturc/junit2html/pkg/convert"
 )
 
 func main() {
